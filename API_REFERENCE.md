@@ -72,6 +72,8 @@ In a real app, you would decode the token to get the user ID.
     "snippetsCount": 0,
     "categoriesCount": 0,
     "tagsCount": 0,
+    "blogsNewThisMonth": 0,
+    "snippetsNewThisMonth": 0,
     "latestActivity": "any"
   }
   ```
@@ -352,13 +354,35 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
-### 6.3 删除分类
+### 6.3 更新分类
+- **URL**: `/api/v1/backstage/categories/{id}`
+- **Method**: `PUT`
+- **请求参数**:
+  ```json
+  {
+    "name": "string",
+    "icon": "any",
+    "color": "any"
+  }
+  ```
+- **响应数据**:
+  ```json
+  {
+    "name": "string",
+    "icon": "any",
+    "color": "any",
+    "id": "string",
+    "count": 0
+  }
+  ```
+
+### 6.4 删除分类
 - **URL**: `/api/v1/backstage/categories/{id}`
 - **Method**: `DELETE`
 - **响应数据**:
   (无返回数据)
 
-### 6.4 获取标签列表
+### 6.5 获取标签列表
 - **URL**: `/api/v1/backstage/tags`
 - **Method**: `GET`
 - **响应数据**:
@@ -373,7 +397,7 @@ In a real app, you would decode the token to get the user ID.
   ]
   ```
 
-### 6.5 创建标签
+### 6.6 创建标签
 - **URL**: `/api/v1/backstage/tags`
 - **Method**: `POST`
 - **请求参数**:
@@ -393,7 +417,27 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
-### 6.6 删除标签
+### 6.7 更新标签
+- **URL**: `/api/v1/backstage/tags/{id}`
+- **Method**: `PUT`
+- **请求参数**:
+  ```json
+  {
+    "name": "string",
+    "color": "any"
+  }
+  ```
+- **响应数据**:
+  ```json
+  {
+    "name": "string",
+    "color": "any",
+    "id": "string",
+    "count": 0
+  }
+  ```
+
+### 6.8 删除标签
 - **URL**: `/api/v1/backstage/tags/{id}`
 - **Method**: `DELETE`
 - **响应数据**:

@@ -64,6 +64,8 @@ interface ApiResponse<T> {
     "snippetsCount": 350,
     "categoriesCount": 8,
     "tagsCount": 24,
+    "blogsNewThisMonth": 5,
+    "snippetsNewThisMonth": 12,
     "latestActivity": [ ... ] // 可选，最新的动态
   }
   ```
@@ -192,21 +194,31 @@ interface ApiResponse<T> {
 - **Method**: `POST`
 - **请求参数**: `{ "name": "新分类", "icon": "...", "color": "..." }`
 
-### 6.3 删除分类
+### 6.3 更新分类
+- **URL**: `/categories/:id`
+- **Method**: `PUT`
+- **请求参数**: `{ "name": "更新分类", "icon": "...", "color": "..." }`
+
+### 6.4 删除分类
 - **URL**: `/categories/:id`
 - **Method**: `DELETE`
 
-### 6.4 获取所有标签
+### 6.5 获取所有标签
 - **URL**: `/tags`
 - **Method**: `GET`
 - **响应数据**: `[{ "id": "1", "name": "React", "count": 5, "color": "cyan" }]`
 
-### 6.5 创建标签
+### 6.6 创建标签
 - **URL**: `/tags`
 - **Method**: `POST`
 - **请求参数**: `{ "name": "新标签", "color": "cyan" }`
 
-### 6.6 删除标签
+### 6.7 更新标签
+- **URL**: `/tags/:id`
+- **Method**: `PUT`
+- **请求参数**: `{ "name": "更新标签", "color": "blue" }`
+
+### 6.8 删除标签
 - **URL**: `/tags/:id`
 - **Method**: `DELETE`
 

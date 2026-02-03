@@ -30,6 +30,8 @@ class DashboardStats(BaseModel):
     snippetsCount: int
     categoriesCount: int
     tagsCount: int
+    blogsNewThisMonth: int
+    snippetsNewThisMonth: int
     latestActivity: Optional[List[Any]] = None
 
 # --- Taxonomy ---
@@ -45,6 +47,9 @@ class Category(CategoryBase):
 class CategoryCreate(CategoryBase):
     pass
 
+class CategoryUpdate(CategoryBase):
+    name: Optional[str] = None
+
 class TagBase(BaseModel):
     name: str
     color: Optional[str] = None
@@ -55,6 +60,9 @@ class Tag(TagBase):
 
 class TagCreate(TagBase):
     pass
+
+class TagUpdate(TagBase):
+    name: Optional[str] = None
 
 # --- Blogs ---
 class BlogBase(BaseModel):

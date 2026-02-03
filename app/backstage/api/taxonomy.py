@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.backstage.schemas import Category as CategorySchema, CategoryCreate, Tag as TagSchema, TagCreate, ApiResponse
+from app.backstage.schemas import Category as CategorySchema, CategoryCreate, CategoryUpdate, Tag as TagSchema, TagCreate, TagUpdate, ApiResponse
 from app.core.database import get_db
 from app.models import Category, Tag, Blog
 from typing import List
@@ -39,6 +39,31 @@ async def create_category(cat_in: CategoryCreate, db: Session = Depends(get_db))
     db.commit()
     db.refresh(new_cat)
     return ApiResponse(data=CategorySchema(**new_cat.__dict__, count=0))
+
+@router.put("/categories/{id}", response_model=ApiResponse[CategorySchema], summary="更新分类")
+async def update_category(id: str, cat_in: CategoryUpdate, db: Session = Depends(get_db)):
+    cat = db.query(Category).filter(Category.id == id).first()
+    if not cat:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    if cat_in.name and cat_in.name != cat.name:
+        existing = db.query(Category).filter(Category.name == cat_in.name).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Category name already exists")
+    
+    if cat_in.name:
+        cat.name = cat_in.name
+    if cat_in.icon:
+        cat.icon = cat_in.icon
+    if cat_in.color:
+        cat.color = cat_in.color
+        
+    db.commit()
+    db.refresh(cat)
+    
+    # Recalculate count
+    count = db.query(Blog).filter(Blog.category_id == cat.id).count()
+    return ApiResponse(data=CategorySchema(**cat.__dict__, count=count))
 
 @router.delete("/categories/{id}", response_model=ApiResponse[dict], summary="删除分类")
 async def delete_category(id: str, db: Session = Depends(get_db)):
@@ -85,6 +110,29 @@ async def create_tag(tag_in: TagCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_tag)
     return ApiResponse(data=TagSchema(**new_tag.__dict__, count=0))
+
+@router.put("/tags/{id}", response_model=ApiResponse[TagSchema], summary="更新标签")
+async def update_tag(id: str, tag_in: TagUpdate, db: Session = Depends(get_db)):
+    tag = db.query(Tag).filter(Tag.id == id).first()
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+        
+    if tag_in.name and tag_in.name != tag.name:
+        existing = db.query(Tag).filter(Tag.name == tag_in.name).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Tag name already exists")
+            
+    if tag_in.name:
+        tag.name = tag_in.name
+    if tag_in.color:
+        tag.color = tag_in.color
+        
+    db.commit()
+    db.refresh(tag)
+    
+    # Recalculate count (approximation or eager load)
+    count = len(tag.blogs) 
+    return ApiResponse(data=TagSchema(**tag.__dict__, count=count))
 
 @router.delete("/tags/{id}", response_model=ApiResponse[dict], summary="删除标签")
 async def delete_tag(id: str, db: Session = Depends(get_db)):
