@@ -66,7 +66,20 @@ interface ApiResponse<T> {
     "tagsCount": 24,
     "blogsNewThisMonth": 5,
     "snippetsNewThisMonth": 12,
-    "latestActivity": [ ... ] // 可选，最新的动态
+    "latestActivity": [
+      {
+        "id": "1",
+        "title": "React 19 新特性解析",
+        "type": "blog",
+        "createdAt": "2023-10-01T12:00:00Z"
+      },
+      {
+        "id": "2",
+        "title": "今日感悟...",
+        "type": "snippet",
+        "createdAt": "2023-10-02T09:30:00Z"
+      }
+    ]
   }
   ```
 

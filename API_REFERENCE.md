@@ -74,7 +74,14 @@ In a real app, you would decode the token to get the user ID.
     "tagsCount": 0,
     "blogsNewThisMonth": 0,
     "snippetsNewThisMonth": 0,
-    "latestActivity": "any"
+    "latestActivity": [
+      {
+        "id": "string",
+        "title": "string",
+        "type": "string",
+        "createdAt": "string"
+      }
+    ]
   }
   ```
 
