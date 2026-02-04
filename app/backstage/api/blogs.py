@@ -144,9 +144,6 @@ async def get_blog_detail(id: str, db: Session = Depends(get_db)):
     tags_schema = [
         TagSchema(id=t.id, name=t.name, color=t.color, count=0) for t in b.tags
     ]
-    
-    # Sync MD file
-    sync_blog_file(new_blog.id, new_blog.title, new_blog.content)
 
     return ApiResponse(data=BlogSchema(
         id=b.id,
@@ -179,7 +176,33 @@ async def create_blog(blog_in: BlogCreate, db: Session = Depends(get_db)):
     if blog_in.tagIds:
         tags = db.query(Tag).filter(Tag.id.in_(blog_in.tagIds)).all()
     
+    # Generate ID: blog_000001
+    # Find max ID starting with "blog_"
+    # Since we can't easily do regex/casting in generic SQL reliably across DBs without raw SQL,
+    # and we expect ID format to be mixed (UUIDs vs blog_XXXXXX), 
+    # we can fetch all IDs starting with blog_ and sort in python, or try a raw query.
+    # Given the volume might be small for a personal blog, fetching IDs is okay.
+    # Better: Use a raw SQL to get max number.
+    
+    # Simple approach: fetch all IDs, filter in python.
+    # Optimized for many blogs: db.query(Blog.id).filter(Blog.id.like("blog_%")).all()
+    existing_ids = db.query(Blog.id).filter(Blog.id.like("blog_%")).all()
+    max_n = 0
+    for (bid,) in existing_ids:
+        try:
+            # bid is like "blog_000123"
+            parts = bid.split('_')
+            if len(parts) == 2 and parts[1].isdigit():
+                n = int(parts[1])
+                if n > max_n:
+                    max_n = n
+        except:
+            pass
+            
+    new_id = f"blog_{max_n + 1:06d}"
+
     new_blog = Blog(
+        id=new_id,
         title=blog_in.title,
         subtitle=blog_in.subtitle,
         content=blog_in.content,
@@ -192,6 +215,9 @@ async def create_blog(blog_in: BlogCreate, db: Session = Depends(get_db)):
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
+
+    # Sync MD file
+    sync_blog_file(new_blog.id, new_blog.title, new_blog.content)
     
     # Re-fetch to get relationships populated (or rely on commit refresh, but relationship might need explicit load)
     # Using the same mapping logic as get_detail via pydantic from_orm if Config is set, 

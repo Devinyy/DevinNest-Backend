@@ -34,31 +34,70 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
     activity_list = []
     
     for b in latest_blogs:
+        category_data = None
+        if b.category:
+            category_data = {
+                "id": b.category.id,
+                "name": b.category.name,
+                "color": b.category.color
+            }
+            
+        tags_data = []
+        for t in b.tags:
+            tags_data.append({
+                "id": t.id,
+                "name": t.name,
+                "color": t.color
+            })
+            
         activity_list.append({
             "id": b.id,
             "title": b.title,
             "type": "blog",
-            "createdAt": b.created_at
+            "createdAt": b.created_at,
+            "cover": b.cover,
+            "category": category_data,
+            "tags": tags_data
         })
         
     for s in latest_snippets:
-        # Extract snippet content preview
+        # Extract snippet content preview and cover
         content_preview = "New Snippet"
+        cover = None
+        
         if s.content and isinstance(s.content, list) and len(s.content) > 0:
             for block in s.content:
                 # Assuming block is a dict
-                if isinstance(block, dict) and block.get("type") == "text":
-                    content_preview = block.get("content", "")
-                    break
+                if isinstance(block, dict):
+                    if block.get("type") == "text" and content_preview == "New Snippet":
+                        content_preview = block.get("content", "")
+                    
+                    if block.get("type") == "image" and cover is None:
+                        cover = block.get("src")
+                        
+                    if content_preview != "New Snippet" and cover is not None:
+                        break
+                        
             # If no text block found, try to use the first block's content or type
             if content_preview == "New Snippet" and isinstance(s.content[0], dict):
                  content_preview = s.content[0].get("content") or s.content[0].get("type", "Media")
+        
+        tags_data = []
+        for t in s.tags:
+            tags_data.append({
+                "id": t.id,
+                "name": t.name,
+                "color": t.color
+            })
                  
         activity_list.append({
             "id": s.id,
             "title": str(content_preview)[:50] if content_preview else "Untitled",
             "type": "snippet",
-            "createdAt": s.created_at
+            "createdAt": s.created_at,
+            "cover": cover,
+            "category": None, # Snippets don't have categories
+            "tags": tags_data
         })
     
     # Sort by createdAt descending and take top 5
