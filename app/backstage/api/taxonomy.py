@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.backstage.schemas import Category as CategorySchema, CategoryCreate, CategoryUpdate, Tag as TagSchema, TagCreate, TagUpdate, ApiResponse
+from app.backstage.schemas import Category as CategorySchema, CategoryCreate, CategoryUpdate, Tag as TagSchema, TagCreate, TagUpdate, ApiResponse, DeleteRequest
 from app.core.database import get_db
 from app.models import Category, Tag, Blog
 from typing import List
@@ -24,7 +24,7 @@ async def get_categories(db: Session = Depends(get_db)):
         ))
     return ApiResponse(data=result)
 
-@router.post("/categories", response_model=ApiResponse[CategorySchema], summary="创建分类")
+@router.post("/categories/create", response_model=ApiResponse[CategorySchema], summary="创建分类")
 async def create_category(cat_in: CategoryCreate, db: Session = Depends(get_db)):
     existing = db.query(Category).filter(Category.name == cat_in.name).first()
     if existing:
@@ -40,8 +40,9 @@ async def create_category(cat_in: CategoryCreate, db: Session = Depends(get_db))
     db.refresh(new_cat)
     return ApiResponse(data=CategorySchema(**new_cat.__dict__, count=0))
 
-@router.put("/categories/{id}", response_model=ApiResponse[CategorySchema], summary="更新分类")
-async def update_category(id: str, cat_in: CategoryUpdate, db: Session = Depends(get_db)):
+@router.post("/categories/update", response_model=ApiResponse[CategorySchema], summary="更新分类")
+async def update_category(cat_in: CategoryUpdate, db: Session = Depends(get_db)):
+    id = cat_in.id
     cat = db.query(Category).filter(Category.id == id).first()
     if not cat:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -65,8 +66,9 @@ async def update_category(id: str, cat_in: CategoryUpdate, db: Session = Depends
     count = db.query(Blog).filter(Blog.category_id == cat.id).count()
     return ApiResponse(data=CategorySchema(**cat.__dict__, count=count))
 
-@router.delete("/categories/{id}", response_model=ApiResponse[dict], summary="删除分类")
-async def delete_category(id: str, db: Session = Depends(get_db)):
+@router.post("/categories/delete", response_model=ApiResponse[dict], summary="删除分类")
+async def delete_category(req: DeleteRequest, db: Session = Depends(get_db)):
+    id = req.id
     cat = db.query(Category).filter(Category.id == id).first()
     if not cat:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -96,7 +98,7 @@ async def get_tags(db: Session = Depends(get_db)):
         ))
     return ApiResponse(data=result)
 
-@router.post("/tags", response_model=ApiResponse[TagSchema], summary="创建标签")
+@router.post("/tags/create", response_model=ApiResponse[TagSchema], summary="创建标签")
 async def create_tag(tag_in: TagCreate, db: Session = Depends(get_db)):
     existing = db.query(Tag).filter(Tag.name == tag_in.name).first()
     if existing:
@@ -111,8 +113,9 @@ async def create_tag(tag_in: TagCreate, db: Session = Depends(get_db)):
     db.refresh(new_tag)
     return ApiResponse(data=TagSchema(**new_tag.__dict__, count=0))
 
-@router.put("/tags/{id}", response_model=ApiResponse[TagSchema], summary="更新标签")
-async def update_tag(id: str, tag_in: TagUpdate, db: Session = Depends(get_db)):
+@router.post("/tags/update", response_model=ApiResponse[TagSchema], summary="更新标签")
+async def update_tag(tag_in: TagUpdate, db: Session = Depends(get_db)):
+    id = tag_in.id
     tag = db.query(Tag).filter(Tag.id == id).first()
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
@@ -134,8 +137,9 @@ async def update_tag(id: str, tag_in: TagUpdate, db: Session = Depends(get_db)):
     count = len(tag.blogs) 
     return ApiResponse(data=TagSchema(**tag.__dict__, count=count))
 
-@router.delete("/tags/{id}", response_model=ApiResponse[dict], summary="删除标签")
-async def delete_tag(id: str, db: Session = Depends(get_db)):
+@router.post("/tags/delete", response_model=ApiResponse[dict], summary="删除标签")
+async def delete_tag(req: DeleteRequest, db: Session = Depends(get_db)):
+    id = req.id
     tag = db.query(Tag).filter(Tag.id == id).first()
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")

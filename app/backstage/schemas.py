@@ -10,6 +10,9 @@ class ApiResponse(BaseModel, Generic[T]):
     message: str = "success"
     data: Optional[T] = None
 
+class DeleteRequest(BaseModel):
+    id: str
+
 # --- Auth ---
 class LoginRequest(BaseModel):
     username: str
@@ -48,6 +51,7 @@ class CategoryCreate(CategoryBase):
     pass
 
 class CategoryUpdate(CategoryBase):
+    id: str
     name: Optional[str] = None
 
 class TagBase(BaseModel):
@@ -62,6 +66,7 @@ class TagCreate(TagBase):
     pass
 
 class TagUpdate(TagBase):
+    id: str
     name: Optional[str] = None
 
 # --- Blogs ---
@@ -77,6 +82,7 @@ class BlogCreate(BlogBase):
     content: str
 
 class BlogUpdate(BlogBase):
+    id: str
     content: Optional[str] = None
 
 class Blog(BlogBase):
@@ -111,6 +117,9 @@ class SnippetCreate(BaseModel):
     metadata: SnippetMetadata
     tags: List[str] = []
 
+class SnippetUpdate(SnippetCreate):
+    id: str
+
 class Snippet(SnippetCreate):
     id: str
 
@@ -118,3 +127,4 @@ class Snippet(SnippetCreate):
 class UploadResponse(BaseModel):
     url: str
     filename: str
+    path: str # Added path field

@@ -29,6 +29,15 @@ backstage_router.include_router(dashboard_router, prefix="/dashboard", tags=["ba
 backstage_router.include_router(blogs_router, prefix="/blogs", tags=["backstage-blogs"])
 backstage_router.include_router(snippets_router, prefix="/snippets", tags=["backstage-snippets"])
 backstage_router.include_router(taxonomy_router, tags=["backstage-taxonomy"]) # /categories, /tags are root relative
-backstage_router.include_router(common_router, tags=["backstage-common"]) # /upload
+backstage_router.include_router(common_router, tags=["backstage-common"]) # /upload is root relative in common router
 
 api_router.include_router(backstage_router, prefix="/backstage")
+
+# Register common router at top level api/v1/upload as well for easier access if needed, or check prefix
+# common.py defines @router.post("/upload").
+# Included in backstage_router with no prefix => /api/v1/backstage/upload
+# User requested api/v1/upload 404.
+# So we need to expose it at /api/v1/upload or tell user correct path.
+# Let's add it to api_router directly as well or move it.
+# To satisfy "api/v1/upload", we mount common_router directly to api_router
+api_router.include_router(common_router, tags=["common"])

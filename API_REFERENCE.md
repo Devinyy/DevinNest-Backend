@@ -108,7 +108,7 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 4.2 Create Blog
-- **URL**: `/api/v1/backstage/blogs`
+- **URL**: `/api/v1/backstage/blogs/create`
 - **Method**: `POST`
 - **描述**: Create a new blog.
 - **请求参数**:
@@ -174,12 +174,13 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 4.4 更新博客
-- **URL**: `/api/v1/backstage/blogs/{id}`
-- **Method**: `PUT`
+- **URL**: `/api/v1/backstage/blogs/update`
+- **Method**: `POST`
 - **描述**: 更新博客文章。
 - **请求参数**:
   ```json
   {
+    "id": "string",
     "title": "string",
     "subtitle": "any",
     "cover": "any",
@@ -214,9 +215,15 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 4.5 删除博客
-- **URL**: `/api/v1/backstage/blogs/{id}`
-- **Method**: `DELETE`
+- **URL**: `/api/v1/backstage/blogs/delete`
+- **Method**: `POST`
 - **描述**: 删除博客文章。
+- **请求参数**:
+  ```json
+  {
+    "id": "string"
+  }
+  ```
 - **响应数据**:
   (无返回数据)
 
@@ -241,7 +248,7 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 5.2 Create Snippet
-- **URL**: `/api/v1/backstage/snippets`
+- **URL**: `/api/v1/backstage/snippets/create`
 - **Method**: `POST`
 - **请求参数**:
   ```json
@@ -287,11 +294,12 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 5.4 更新碎片
-- **URL**: `/api/v1/backstage/snippets/{id}`
-- **Method**: `PUT`
+- **URL**: `/api/v1/backstage/snippets/update`
+- **Method**: `POST`
 - **请求参数**:
   ```json
   {
+    "id": "string",
     "content": [
       "..."
     ],
@@ -316,8 +324,14 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 5.5 删除碎片
-- **URL**: `/api/v1/backstage/snippets/{id}`
-- **Method**: `DELETE`
+- **URL**: `/api/v1/backstage/snippets/delete`
+- **Method**: `POST`
+- **请求参数**:
+  ```json
+  {
+    "id": "string"
+  }
+  ```
 - **响应数据**:
   (无返回数据)
 
@@ -340,7 +354,7 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.2 创建分类
-- **URL**: `/api/v1/backstage/categories`
+- **URL**: `/api/v1/backstage/categories/create`
 - **Method**: `POST`
 - **请求参数**:
   ```json
@@ -362,11 +376,12 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.3 更新分类
-- **URL**: `/api/v1/backstage/categories/{id}`
-- **Method**: `PUT`
+- **URL**: `/api/v1/backstage/categories/update`
+- **Method**: `POST`
 - **请求参数**:
   ```json
   {
+    "id": "string",
     "name": "string",
     "icon": "any",
     "color": "any"
@@ -384,8 +399,14 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.4 删除分类
-- **URL**: `/api/v1/backstage/categories/{id}`
-- **Method**: `DELETE`
+- **URL**: `/api/v1/backstage/categories/delete`
+- **Method**: `POST`
+- **请求参数**:
+  ```json
+  {
+    "id": "string"
+  }
+  ```
 - **响应数据**:
   (无返回数据)
 
@@ -405,7 +426,7 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.6 创建标签
-- **URL**: `/api/v1/backstage/tags`
+- **URL**: `/api/v1/backstage/tags/create`
 - **Method**: `POST`
 - **请求参数**:
   ```json
@@ -425,11 +446,12 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.7 更新标签
-- **URL**: `/api/v1/backstage/tags/{id}`
-- **Method**: `PUT`
+- **URL**: `/api/v1/backstage/tags/update`
+- **Method**: `POST`
 - **请求参数**:
   ```json
   {
+    "id": "string",
     "name": "string",
     "color": "any"
   }
@@ -445,8 +467,14 @@ In a real app, you would decode the token to get the user ID.
   ```
 
 ### 6.8 删除标签
-- **URL**: `/api/v1/backstage/tags/{id}`
-- **Method**: `DELETE`
+- **URL**: `/api/v1/backstage/tags/delete`
+- **Method**: `POST`
+- **请求参数**:
+  ```json
+  {
+    "id": "string"
+  }
+  ```
 - **响应数据**:
   (无返回数据)
 

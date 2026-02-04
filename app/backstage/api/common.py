@@ -3,6 +3,7 @@ from app.backstage.schemas import UploadResponse, ApiResponse
 import shutil
 import os
 import uuid
+import re
 from pathlib import Path
 
 router = APIRouter()
@@ -16,10 +17,22 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     """
     上传文件到服务器。
     """
-    # Generate unique filename
-    file_ext = os.path.splitext(file.filename)[1]
-    unique_filename = f"{uuid.uuid4()}{file_ext}"
-    file_path = UPLOAD_DIR / unique_filename
+    # Sanitize and use original filename
+    original_filename = file.filename
+    # Remove directory paths if present and sanitize characters
+    filename = os.path.basename(original_filename)
+    filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
+    
+    # Handle duplicates
+    name, ext = os.path.splitext(filename)
+    counter = 1
+    final_filename = filename
+    
+    while (UPLOAD_DIR / final_filename).exists():
+        final_filename = f"{name}_{counter}{ext}"
+        counter += 1
+        
+    file_path = UPLOAD_DIR / final_filename
     
     # Save file
     with file_path.open("wb") as buffer:
@@ -28,9 +41,10 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
     # Construct URL
     # Assuming the app is served at root, and static files are mounted at /static
     base_url = str(request.base_url).rstrip("/")
-    file_url = f"{base_url}/static/uploads/{unique_filename}"
+    file_url = f"{base_url}/static/uploads/{final_filename}"
     
     return ApiResponse(data=UploadResponse(
         url=file_url,
-        filename=unique_filename
+        filename=final_filename,
+        path=str(file_path)
     ))

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.backstage.schemas import Snippet as SnippetSchema, SnippetCreate, SnippetMetadata, SnippetBlock, ApiResponse
+from app.backstage.schemas import Snippet as SnippetSchema, SnippetCreate, SnippetUpdate, SnippetMetadata, SnippetBlock, ApiResponse, DeleteRequest
 from app.core.database import get_db
 from app.models import Snippet, Tag
 from typing import List
@@ -36,9 +36,9 @@ async def get_snippet_detail(id: str, db: Session = Depends(get_db)):
         tags=[t.name for t in s.tags]
     ))
 
-@router.post("", response_model=ApiResponse[SnippetSchema], summary="创建碎片")
+@router.post("/create", response_model=ApiResponse[SnippetSchema], summary="创建碎片")
 async def create_snippet(snippet_in: SnippetCreate, db: Session = Depends(get_db)):
-    # Handle Tags: For snippets, schema says tags: List[str]. 
+    # Handle Tags: For snippets, schema says tags: List[str].  
     # We should find existing tags by name or create new ones? 
     # Or assume they refer to existing tags? 
     # Usually "tags" as strings implies simple tagging. 
@@ -84,8 +84,9 @@ async def create_snippet(snippet_in: SnippetCreate, db: Session = Depends(get_db
         tags=[t.name for t in new_snippet.tags]
     ))
 
-@router.put("/{id}", response_model=ApiResponse[SnippetSchema], summary="更新碎片")
-async def update_snippet(id: str, snippet_in: SnippetCreate, db: Session = Depends(get_db)):
+@router.post("/update", response_model=ApiResponse[SnippetSchema], summary="更新碎片")
+async def update_snippet(snippet_in: SnippetUpdate, db: Session = Depends(get_db)):
+    id = snippet_in.id
     s = db.query(Snippet).filter(Snippet.id == id).first()
     if not s:
         raise HTTPException(status_code=404, detail="Snippet not found")
@@ -120,8 +121,9 @@ async def update_snippet(id: str, snippet_in: SnippetCreate, db: Session = Depen
         tags=[t.name for t in s.tags]
     ))
 
-@router.delete("/{id}", response_model=ApiResponse[dict], summary="删除碎片")
-async def delete_snippet(id: str, db: Session = Depends(get_db)):
+@router.post("/delete", response_model=ApiResponse[dict], summary="删除碎片")
+async def delete_snippet(req: DeleteRequest, db: Session = Depends(get_db)):
+    id = req.id
     s = db.query(Snippet).filter(Snippet.id == id).first()
     if not s:
         raise HTTPException(status_code=404, detail="Snippet not found")

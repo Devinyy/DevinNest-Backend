@@ -1,11 +1,62 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
-from app.backstage.schemas import Blog as BlogSchema, BlogListResponse, BlogCreate, BlogUpdate, Category as CategorySchema, Tag as TagSchema, ApiResponse
+from app.backstage.schemas import Blog as BlogSchema, BlogListResponse, BlogCreate, BlogUpdate, Category as CategorySchema, Tag as TagSchema, ApiResponse, DeleteRequest
 from app.core.database import get_db
 from app.models import Blog, Category, Tag
 from typing import List, Optional
+import os
+import re
+from pathlib import Path
 
 router = APIRouter()
+
+# --- File Sync Helpers ---
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+STATIC_BLOGS_DIR = BASE_DIR / "static" / "blogs"
+
+def get_blog_filename(id: str, title: str) -> str:
+    # Sanitize title to be safe for filenames
+    safe_title = re.sub(r'[\\/*?:"<>|]', '_', title)
+    return f"{id}_{safe_title}.md"
+
+def sync_blog_file(id: str, title: str, content: str):
+    try:
+        if not STATIC_BLOGS_DIR.exists():
+            STATIC_BLOGS_DIR.mkdir(parents=True, exist_ok=True)
+            
+        filename = get_blog_filename(id, title)
+        file_path = STATIC_BLOGS_DIR / filename
+        
+        # Write content (handle None content)
+        write_content = content if content else ""
+        
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(write_content)
+            
+    except Exception as e:
+        print(f"Error syncing blog file: {e}")
+
+def remove_blog_file(id: str, title: str):
+    try:
+        filename = get_blog_filename(id, title)
+        file_path = STATIC_BLOGS_DIR / filename
+        if file_path.exists():
+            os.remove(file_path)
+    except Exception as e:
+        print(f"Error removing blog file: {e}")
+
+@router.post("/sync-md-files", response_model=ApiResponse[dict], summary="同步所有博客MD文件")
+async def sync_all_md_files(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """
+    手动触发同步所有博客的Markdown文件到 /static/blogs/ 目录。
+    """
+    blogs = db.query(Blog).all()
+    count = 0
+    for blog in blogs:
+        background_tasks.add_task(sync_blog_file, blog.id, blog.title, blog.content)
+        count += 1
+        
+    return ApiResponse(message=f"Started syncing {count} blogs")
 
 @router.get("", response_model=ApiResponse[BlogListResponse], summary="获取博客列表")
 async def get_blogs(
@@ -94,6 +145,9 @@ async def get_blog_detail(id: str, db: Session = Depends(get_db)):
         TagSchema(id=t.id, name=t.name, color=t.color, count=0) for t in b.tags
     ]
     
+    # Sync MD file
+    sync_blog_file(new_blog.id, new_blog.title, new_blog.content)
+
     return ApiResponse(data=BlogSchema(
         id=b.id,
         title=b.title,
@@ -109,7 +163,7 @@ async def get_blog_detail(id: str, db: Session = Depends(get_db)):
         tags=tags_schema
     ))
 
-@router.post("", response_model=ApiResponse[BlogSchema], summary="创建博客")
+@router.post("/create", response_model=ApiResponse[BlogSchema], summary="创建博客")
 async def create_blog(blog_in: BlogCreate, db: Session = Depends(get_db)):
     """
     创建新的博客文章。
@@ -165,14 +219,18 @@ async def create_blog(blog_in: BlogCreate, db: Session = Depends(get_db)):
         tags=tags_schema
     ))
 
-@router.put("/{id}", response_model=ApiResponse[BlogSchema], summary="更新博客")
-async def update_blog(id: str, blog_in: BlogUpdate, db: Session = Depends(get_db)):
+@router.post("/update", response_model=ApiResponse[BlogSchema], summary="更新博客")
+async def update_blog(blog_in: BlogUpdate, db: Session = Depends(get_db)):
     """
     更新博客文章。
     """
+    id = blog_in.id
     blog = db.query(Blog).filter(Blog.id == id).first()
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
+    
+    # Store old title for file renaming if needed
+    old_title = blog.title
     
     # Update fields
     if blog_in.title is not None: blog.title = blog_in.title
@@ -189,6 +247,13 @@ async def update_blog(id: str, blog_in: BlogUpdate, db: Session = Depends(get_db
         
     db.commit()
     db.refresh(blog)
+    
+    # Sync MD file
+    # If title changed, remove old file
+    if old_title != blog.title:
+        remove_blog_file(blog.id, old_title)
+        
+    sync_blog_file(blog.id, blog.title, blog.content)
     
     cat_schema = None
     if blog.category:
@@ -211,15 +276,20 @@ async def update_blog(id: str, blog_in: BlogUpdate, db: Session = Depends(get_db
         tags=tags_schema
     ))
 
-@router.delete("/{id}", response_model=ApiResponse[dict], summary="删除博客")
-async def delete_blog(id: str, db: Session = Depends(get_db)):
+@router.post("/delete", response_model=ApiResponse[dict], summary="删除博客")
+async def delete_blog(req: DeleteRequest, db: Session = Depends(get_db)):
     """
     删除博客文章。
     """
+    id = req.id
     blog = db.query(Blog).filter(Blog.id == id).first()
     if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
         
     db.delete(blog)
     db.commit()
+    
+    # Remove MD file
+    remove_blog_file(blog.id, blog.title)
+    
     return ApiResponse(message="Deleted successfully")
