@@ -67,7 +67,23 @@ async def create_snippet(snippet_in: SnippetCreate, db: Session = Depends(get_db
     # Actually SQLAlchemy with SQLite/JSON handles basic types. Datetime might be tricky.
     # Let's ensure primitives.
     
+    # Generate ID: snippet_000001
+    existing_ids = db.query(Snippet.id).filter(Snippet.id.like("snippet_%")).all()
+    max_n = 0
+    for (sid,) in existing_ids:
+        try:
+            parts = sid.split('_')
+            if len(parts) == 2 and parts[1].isdigit():
+                n = int(parts[1])
+                if n > max_n:
+                    max_n = n
+        except:
+            pass
+            
+    new_id = f"snippet_{max_n + 1:06d}"
+
     new_snippet = Snippet(
+        id=new_id,
         content=content_json,
         metadata_info=metadata_json,
         tags=tag_objs
