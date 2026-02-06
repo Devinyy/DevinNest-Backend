@@ -17,6 +17,9 @@ async def get_snippets(page: int = 1, pageSize: int = 10, db: Session = Depends(
         # Construct schema
         result.append(SnippetSchema(
             id=s.id,
+            title=s.title,
+            subtitle=s.subtitle,
+            cover=s.cover,
             content=s.content,
             metadata=s.metadata_info,
             tags=[t.name for t in s.tags] # Schema expects list of strings for tags
@@ -31,6 +34,9 @@ async def get_snippet_detail(id: str, db: Session = Depends(get_db)):
         
     return ApiResponse(data=SnippetSchema(
         id=s.id,
+        title=s.title,
+        subtitle=s.subtitle,
+        cover=s.cover,
         content=s.content,
         metadata=s.metadata_info,
         tags=[t.name for t in s.tags]
@@ -84,6 +90,9 @@ async def create_snippet(snippet_in: SnippetCreate, db: Session = Depends(get_db
 
     new_snippet = Snippet(
         id=new_id,
+        title=snippet_in.title,
+        subtitle=snippet_in.subtitle,
+        cover=snippet_in.cover,
         content=content_json,
         metadata_info=metadata_json,
         tags=tag_objs
@@ -95,6 +104,9 @@ async def create_snippet(snippet_in: SnippetCreate, db: Session = Depends(get_db
     
     return ApiResponse(data=SnippetSchema(
         id=new_snippet.id,
+        title=new_snippet.title,
+        subtitle=new_snippet.subtitle,
+        cover=new_snippet.cover,
         content=new_snippet.content,
         metadata=new_snippet.metadata_info,
         tags=[t.name for t in new_snippet.tags]
@@ -108,6 +120,9 @@ async def update_snippet(snippet_in: SnippetUpdate, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Snippet not found")
         
     # Update fields
+    s.title = snippet_in.title
+    s.subtitle = snippet_in.subtitle
+    s.cover = snippet_in.cover
     s.content = [block.dict() for block in snippet_in.content]
     
     metadata_json = snippet_in.metadata.dict()
@@ -132,6 +147,9 @@ async def update_snippet(snippet_in: SnippetUpdate, db: Session = Depends(get_db
     
     return ApiResponse(data=SnippetSchema(
         id=s.id,
+        title=s.title,
+        subtitle=s.subtitle,
+        cover=s.cover,
         content=s.content,
         metadata=s.metadata_info,
         tags=[t.name for t in s.tags]

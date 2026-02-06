@@ -100,11 +100,12 @@ class BlogListResponse(BaseModel):
 
 # --- Snippets ---
 class SnippetBlock(BaseModel):
-    type: str # text, image, quote
+    type: str # text, image, quote, gallery
     content: Optional[str] = None
     src: Optional[str] = None
     caption: Optional[str] = None
     author: Optional[str] = None
+    images: Optional[List[str]] = None # For gallery type
 
 class SnippetMetadata(BaseModel):
     weather: Optional[str] = None
@@ -113,6 +114,9 @@ class SnippetMetadata(BaseModel):
     date: datetime
 
 class SnippetCreate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    cover: Optional[str] = None
     content: List[SnippetBlock]
     metadata: SnippetMetadata
     tags: List[str] = []

@@ -181,6 +181,9 @@ interface ApiResponse<T> {
 - **请求参数**:
   ```json
   {
+    "title": "今日随笔",
+    "subtitle": "测试副标题",
+    "cover": "https://example.com/cover.jpg",
     "content": [ // Block 数组
       {
         "type": "text",
@@ -190,6 +193,14 @@ interface ApiResponse<T> {
         "type": "image",
         "src": "https://...",
         "caption": "公园的一角"
+      },
+      {
+        "type": "gallery",
+        "images": [
+            "https://example.com/img1.jpg",
+            "https://example.com/img2.jpg"
+        ],
+        "caption": "公园随拍"
       },
       {
         "type": "quote",

@@ -74,6 +74,9 @@ class Snippet(Base):
     __tablename__ = "snippets"
 
     id = Column(String, primary_key=True)
+    title = Column(String, nullable=True)
+    subtitle = Column(String, nullable=True)
+    cover = Column(String, nullable=True)
     content = Column(JSON) # Stores List[SnippetBlock]
     metadata_info = Column(JSON, name="metadata") # Stores SnippetMetadata. Renamed to avoid reserved word conflict if any, though metadata is fine in SQLAlchemy but mapped to metadata_info
     created_at = Column(DateTime, default=datetime.now)
