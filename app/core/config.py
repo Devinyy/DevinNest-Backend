@@ -9,7 +9,16 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     
     # CORS Configuration
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000", 
+        "http://localhost:8000",
+        "https://devinnest.top",
+        "https://www.devinnest.top",
+        "https://www.devinneststage.top",
+        "https://devinneststage.top",
+        "https://devinnest-api.top",
+        "https://devinnest-api.top:8443"
+    ]
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
