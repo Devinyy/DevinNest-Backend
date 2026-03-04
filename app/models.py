@@ -81,5 +81,6 @@ class Snippet(Base):
     metadata_info = Column(JSON, name="metadata") # Stores SnippetMetadata. Renamed to avoid reserved word conflict if any, though metadata is fine in SQLAlchemy but mapped to metadata_info
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    views = Column(Integer, default=0)
     
     tags = relationship("Tag", secondary=snippet_tags, back_populates="snippets")

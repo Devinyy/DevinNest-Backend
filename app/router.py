@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.llm.api import router as llm_router
 from app.nest.api.projects import router as nest_projects_router
+from app.nest.api.home import router as nest_home_router
 
 # Backstage routers
 from app.backstage.api.auth import router as auth_router
@@ -19,6 +20,7 @@ api_router.include_router(llm_router, prefix="/ai", tags=["ai"])
 # Prefix: /nest
 nest_router = APIRouter()
 nest_router.include_router(nest_projects_router, prefix="/projects", tags=["nest-projects"])
+nest_router.include_router(nest_home_router, prefix="/home", tags=["nest-home"])
 api_router.include_router(nest_router, prefix="/nest")
 
 # DevinNest Backstage (Admin) Routes

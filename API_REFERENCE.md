@@ -565,9 +565,55 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
-## 10. Other
+## 10. 前台首页 (Home)
 
-### 10.1 Root
+### 10.1 获取最新文章
+- **URL**: `/api/v1/nest/home/latest-articles`
+- **Method**: `GET`
+- **描述**: 获取首页展示的最新文章列表（最多4篇）。
+- **响应数据**:
+  ```json
+  {
+    "title": "string",
+    "url": "string",
+    "articles": [
+      {
+        "cover": "string",
+        "title": "string",
+        "subdesc": "string",
+        "url": "string",
+        "time": "string",
+        "views": 0,
+        "category": "string",
+        "tags": [
+          "string"
+        ]
+      }
+    ]
+  }
+  ```
+
+### 10.2 获取最新碎片
+- **URL**: `/api/v1/nest/home/latest-snippets`
+- **Method**: `GET`
+- **描述**: 获取首页展示的最新日常碎片（最多4篇）。
+- **响应数据**:
+  ```json
+  {
+    "diaryCards": [
+      {
+        "title": "string",
+        "url": "string",
+        "bgStyle": "string",
+        "textStyle": "string"
+      }
+    ]
+  }
+  ```
+
+## 11. Other
+
+### 11.1 Root
 - **URL**: `/`
 - **Method**: `GET`
 - **响应数据**:
