@@ -611,7 +611,77 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
-## 11. Other
+## 11. 前台博客 (Blog)
+
+### 11.1 获取博客文章列表
+- **URL**: `/api/v1/nest/blog/list`
+- **Method**: `GET`
+- **描述**: 获取博客文章列表，支持分页、分类/标签筛选、关键词搜索及按年份筛选。
+- **Query 参数**:
+  - `page`: 当前页码 (默认 1)
+  - `pageSize`: 每页条数 (默认 10)
+  - `categoryId`: 按分类ID筛选 (可选)
+  - `tag`: 按标签名筛选 (可选)
+  - `keyword`: 搜索关键词 (可选)
+  - `year`: 按年份筛选 (可选)
+- **响应数据**:
+  ```json
+  {
+    "list": [
+      {
+        "id": "string",
+        "title": "string",
+        "desc": "string",
+        "slug": "string",
+        "cover": "string",
+        "date": "string",
+        "category": {
+          "id": "string",
+          "name": "string"
+        },
+        "tags": [
+          "string"
+        ],
+        "views": 0
+      }
+    ],
+    "total": 0,
+    "totalPages": 0,
+    "currentPage": 0
+  }
+  ```
+
+### 11.2 获取分类统计
+- **URL**: `/api/v1/nest/blog/categories`
+- **Method**: `GET`
+- **描述**: 获取博客分类统计数据。
+- **响应数据**:
+  ```json
+  [
+    {
+      "id": "string",
+      "name": "string",
+      "count": 0,
+      "icon": "string"
+    }
+  ]
+  ```
+
+### 11.3 获取标签统计列表
+- **URL**: `/api/v1/nest/blog/tags`
+- **Method**: `GET`
+- **描述**: 获取所有标签及其关联的文章数量统计。无关联文章的标签 count 为 0。
+- **响应数据**:
+  ```json
+  [
+    {
+      "name": "string",
+      "count": 0
+    }
+  ]
+  ```
+
+## 12. Other
 
 ### 11.1 Root
 - **URL**: `/`

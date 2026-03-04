@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from typing import List, Optional
+from pydantic import BaseModel
 
 class Project(BaseModel):
     id: int
@@ -7,8 +7,38 @@ class Project(BaseModel):
     description: str
     owner: str
 
-# Home API Schemas
+class BlogCategory(BaseModel):
+    id: str
+    name: str
 
+class BlogListItem(BaseModel):
+    id: str
+    title: str
+    desc: Optional[str] = ""
+    slug: str
+    cover: Optional[str] = ""
+    date: str
+    category: Optional[BlogCategory] = None
+    tags: List[str] = []
+    views: int = 0
+
+class BlogListResponse(BaseModel):
+    list: List[BlogListItem]
+    total: int
+    totalPages: int
+    currentPage: int
+
+class CategoryStat(BaseModel):
+    id: str
+    name: str
+    count: int
+    icon: Optional[str] = ""
+
+class TagStat(BaseModel):
+    name: str
+    count: int
+
+# Home API Schemas
 class ArticleItem(BaseModel):
     cover: Optional[str] = ""
     title: str
