@@ -10,7 +10,9 @@ class Settings(BaseSettings):
     
     # CORS Configuration
     BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost", 
         "http://localhost:3000", 
+        "http://localhost:4321",
         "http://localhost:8000",
         "https://devinnest.top",
         "https://www.devinnest.top",

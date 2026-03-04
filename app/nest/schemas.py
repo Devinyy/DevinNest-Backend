@@ -22,6 +22,18 @@ class BlogListItem(BaseModel):
     tags: List[str] = []
     views: int = 0
 
+class BlogDetailResponse(BaseModel):
+    id: str
+    title: str
+    desc: Optional[str] = ""
+    slug: str
+    cover: Optional[str] = ""
+    date: str
+    content: str
+    category: Optional[BlogCategory] = None
+    tags: List[str] = []
+    views: int = 0
+
 class BlogListResponse(BaseModel):
     list: List[BlogListItem]
     total: int

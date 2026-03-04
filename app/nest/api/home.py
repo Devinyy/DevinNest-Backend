@@ -31,7 +31,7 @@ async def get_latest_articles(db: Session = Depends(get_db)):
             cover=blog.cover or "",
             title=blog.title,
             subdesc=blog.subtitle or "",
-            url=f"/blog?id={blog.id}",
+            url=f"/blog/detail?id={blog.id}",
             time=time_str,
             views=blog.views,
             category=category_name,

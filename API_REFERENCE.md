@@ -651,7 +651,32 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
-### 11.2 获取分类统计
+### 11.2 获取博客文章详情
+- **URL**: `/api/v1/nest/blog/{id}`
+- **Method**: `GET`
+- **描述**: 获取博客文章详情，包括正文内容。同时会增加文章的浏览量。仅能获取已发布（published）的文章。
+- **响应数据**:
+  ```json
+  {
+    "id": "string",
+    "title": "string",
+    "desc": "string",
+    "slug": "string",
+    "cover": "string",
+    "date": "string",
+    "content": "string",
+    "category": {
+      "id": "string",
+      "name": "string"
+    },
+    "tags": [
+      "string"
+    ],
+    "views": 0
+  }
+  ```
+
+### 11.3 获取分类统计
 - **URL**: `/api/v1/nest/blog/categories`
 - **Method**: `GET`
 - **描述**: 获取博客分类统计数据。
@@ -667,7 +692,7 @@ In a real app, you would decode the token to get the user ID.
   ]
   ```
 
-### 11.3 获取标签统计列表
+### 11.4 获取标签统计列表
 - **URL**: `/api/v1/nest/blog/tags`
 - **Method**: `GET`
 - **描述**: 获取所有标签及其关联的文章数量统计。无关联文章的标签 count 为 0。

@@ -5,7 +5,7 @@ from typing import List, Optional
 from app.core.database import get_db
 from app.models import Blog, Category, Tag, blog_tags
 from app.backstage.schemas import ApiResponse
-from app.nest.schemas import BlogListResponse, BlogListItem, BlogCategory, CategoryStat, TagStat
+from app.nest.schemas import BlogListResponse, BlogListItem, BlogCategory, CategoryStat, TagStat, BlogDetailResponse
 
 router = APIRouter()
 
@@ -60,7 +60,7 @@ async def get_blog_list(
             id=blog.id,
             title=blog.title,
             desc=blog.subtitle or "",
-            slug=blog.id, # 暂时使用 ID 作为 slug
+            slug=f"{blog.id}_{blog.title}",
             cover=blog.cover or "",
             date=blog.created_at.strftime("%Y-%m-%d"),
             category=category_data,
@@ -109,3 +109,31 @@ async def get_tag_stats(db: Session = Depends(get_db)):
         stats.append(TagStat(name=name, count=count))
         
     return ApiResponse(data=stats)
+
+@router.get("/{id}", response_model=ApiResponse[BlogDetailResponse], summary="获取博客详情")
+async def get_blog_detail(id: str, db: Session = Depends(get_db)):
+    blog = db.query(Blog).filter(Blog.id == id, Blog.status == "published").first()
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    
+    # 增加浏览量
+    blog.views = (blog.views or 0) + 1
+    db.commit()
+    db.refresh(blog)
+    
+    category_data = None
+    if blog.category:
+        category_data = BlogCategory(id=blog.category.id, name=blog.category.name)
+        
+    return ApiResponse(data=BlogDetailResponse(
+        id=blog.id,
+        title=blog.title,
+        desc=blog.subtitle or "",
+        slug=f"{blog.id}_{blog.title}",
+        cover=blog.cover or "",
+        date=blog.created_at.strftime("%Y-%m-%d"),
+        content=blog.content or "",
+        category=category_data,
+        tags=[t.name for t in blog.tags],
+        views=blog.views
+    ))
