@@ -1,0 +1,10 @@
+static/uploads/
+__pycache__/
+*.py[cod]
+*.db-shm
+*.db-wal
+.DS_Store
+*.db
+data/*.db
+data/*.db-shm
+data/*.db-wal
