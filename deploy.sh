@@ -3,7 +3,7 @@
 # 服务器信息
 SERVER_IP="47.103.9.13"
 SERVER_USER="root"
-REMOTE_DIR="/root/devinnest-backend"
+REMOTE_DIR="/opt/devinnest-backend"
 
 # 排除的文件和目录
 EXCLUDE_PARAMS=(
