@@ -92,7 +92,7 @@ async def get_dashboard_stats(db: Session = Depends(get_db)):
                  
         activity_list.append({
             "id": s.id,
-            "title": str(content_preview)[:50] if content_preview else "Untitled",
+            "title": s.title if s.title else (str(content_preview)[:50] if content_preview else "Untitled"),
             "type": "snippet",
             "createdAt": s.created_at,
             "cover": cover,
