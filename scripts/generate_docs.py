@@ -116,6 +116,7 @@ def generate_markdown(openapi_url, output_file):
             "backstage-taxonomy": "分类与标签 (Taxonomy)",
             "backstage-common": "通用接口 (Common)",
             "nest-projects": "DevinNest 项目 (Projects)",
+            "nest-snippet": "DevinNest 碎片 (Snippets)",
             "ai": "AI 服务 (LLM)"
         }
         

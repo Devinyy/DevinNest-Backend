@@ -19,10 +19,24 @@ interface ApiResponse<T> {
 
 ## 2. 认证模块 (Auth)
 
-### 2.1 用户登录
+### 2.1 获取RSA公钥
+- **URL**: `/api/v1/backstage/auth/public-key`
+- **Method**: `GET`
+- **描述**: 获取RSA公钥，用于前端登录时加密密码。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+### 2.2 用户登录
 - **URL**: `/api/v1/backstage/auth/login`
 - **Method**: `POST`
 - **描述**: 用户名密码登录，获取 Token。
+密码应使用公钥加密（可选，支持明文兼容）。
 - **请求参数**:
   ```json
   {
@@ -33,12 +47,13 @@ interface ApiResponse<T> {
 - **响应数据**:
   ```json
   {
-    "token": "string",
-    "userInfo": "..."
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 2.2 获取当前用户信息
+### 2.3 获取当前用户信息
 - **URL**: `/api/v1/backstage/auth/me`
 - **Method**: `GET`
 - **描述**: 校验 Token 有效性并获取用户信息。
@@ -46,18 +61,24 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "id": "string",
-    "username": "string",
-    "avatar": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 2.3 退出登录
+### 2.4 退出登录
 - **URL**: `/api/v1/backstage/auth/logout`
 - **Method**: `POST`
 - **描述**: 退出登录 (Client side clears token).
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
 ## 3. 仪表盘 (Dashboard)
 
@@ -68,26 +89,28 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "blogsCount": 0,
-    "snippetsCount": 0,
-    "categoriesCount": 0,
-    "tagsCount": 0,
-    "blogsNewThisMonth": 0,
-    "snippetsNewThisMonth": 0,
-    "latestActivity": [
-      {
-        "id": "string",
-        "title": "string",
-        "type": "string",
-        "createdAt": "string"
-      }
-    ]
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
 ## 4. 博客管理 (Blogs)
 
-### 4.1 获取博客列表
+### 4.1 同步所有博客MD文件
+- **URL**: `/api/v1/backstage/blogs/sync-md-files`
+- **Method**: `POST`
+- **描述**: 手动触发同步所有博客的Markdown文件到 /static/blogs/ 目录。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+### 4.2 获取博客列表
 - **URL**: `/api/v1/backstage/blogs`
 - **Method**: `GET`
 - **描述**: 获取博客列表，支持分页和筛选。
@@ -100,17 +123,29 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "list": [
-      "..."
-    ],
-    "total": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 4.2 Create Blog
+### 4.3 获取博客详情
+- **URL**: `/api/v1/backstage/blogs/{id}`
+- **Method**: `GET`
+- **描述**: 获取博客详情。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+### 4.4 创建博客
 - **URL**: `/api/v1/backstage/blogs/create`
 - **Method**: `POST`
-- **描述**: Create a new blog.
+- **描述**: 创建新的博客文章。
 - **请求参数**:
   ```json
   {
@@ -128,59 +163,19 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "title": "string",
-    "subtitle": "any",
-    "cover": "any",
-    "categoryId": "string",
-    "tagIds": [
-      "..."
-    ],
-    "status": "string",
-    "id": "string",
-    "content": "any",
-    "views": 0,
-    "createdAt": "string",
-    "category": "any",
-    "tags": [
-      "..."
-    ]
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 4.3 获取博客详情
-- **URL**: `/api/v1/backstage/blogs/{id}`
-- **Method**: `GET`
-- **描述**: 获取博客详情。
-- **响应数据**:
-  ```json
-  {
-    "title": "string",
-    "subtitle": "any",
-    "cover": "any",
-    "categoryId": "string",
-    "tagIds": [
-      "..."
-    ],
-    "status": "string",
-    "id": "string",
-    "content": "any",
-    "views": 0,
-    "createdAt": "string",
-    "category": "any",
-    "tags": [
-      "..."
-    ]
-  }
-  ```
-
-### 4.4 更新博客
+### 4.5 更新博客
 - **URL**: `/api/v1/backstage/blogs/update`
 - **Method**: `POST`
 - **描述**: 更新博客文章。
 - **请求参数**:
   ```json
   {
-    "id": "string",
     "title": "string",
     "subtitle": "any",
     "cover": "any",
@@ -189,32 +184,20 @@ In a real app, you would decode the token to get the user ID.
       "..."
     ],
     "status": "string",
+    "id": "string",
     "content": "any"
   }
   ```
 - **响应数据**:
   ```json
   {
-    "title": "string",
-    "subtitle": "any",
-    "cover": "any",
-    "categoryId": "string",
-    "tagIds": [
-      "..."
-    ],
-    "status": "string",
-    "id": "string",
-    "content": "any",
-    "views": 0,
-    "createdAt": "string",
-    "category": "any",
-    "tags": [
-      "..."
-    ]
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 4.5 删除博客
+### 4.6 删除博客
 - **URL**: `/api/v1/backstage/blogs/delete`
 - **Method**: `POST`
 - **描述**: 删除博客文章。
@@ -225,11 +208,30 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
 ## 5. 碎片管理 (Snippets)
 
-### 5.1 获取碎片列表
+### 5.1 同步所有碎片MD文件
+- **URL**: `/api/v1/backstage/snippets/sync-md-files`
+- **Method**: `POST`
+- **描述**: 手动触发同步所有碎片的Markdown文件到 /static/blogs/ 目录。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+### 5.2 获取碎片列表
 - **URL**: `/api/v1/backstage/snippets`
 - **Method**: `GET`
 - **Query 参数**:
@@ -237,42 +239,10 @@ In a real app, you would decode the token to get the user ID.
   - `pageSize`: - 
 - **响应数据**:
   ```json
-  [
-    {
-      "content": "...",
-      "metadata": "...",
-      "tags": "...",
-      "id": "..."
-    }
-  ]
-  ```
-
-### 5.2 Create Snippet
-- **URL**: `/api/v1/backstage/snippets/create`
-- **Method**: `POST`
-- **请求参数**:
-  ```json
   {
-    "content": [
-      "..."
-    ],
-    "metadata": "...",
-    "tags": [
-      "..."
-    ]
-  }
-  ```
-- **响应数据**:
-  ```json
-  {
-    "content": [
-      "..."
-    ],
-    "metadata": "...",
-    "tags": [
-      "..."
-    ],
-    "id": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -282,24 +252,21 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "content": [
-      "..."
-    ],
-    "metadata": "...",
-    "tags": [
-      "..."
-    ],
-    "id": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 5.4 更新碎片
-- **URL**: `/api/v1/backstage/snippets/update`
+### 5.4 创建碎片
+- **URL**: `/api/v1/backstage/snippets/create`
 - **Method**: `POST`
 - **请求参数**:
   ```json
   {
-    "id": "string",
+    "title": "any",
+    "subtitle": "any",
+    "cover": "any",
     "content": [
       "..."
     ],
@@ -312,6 +279,21 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+### 5.5 更新碎片
+- **URL**: `/api/v1/backstage/snippets/update`
+- **Method**: `POST`
+- **请求参数**:
+  ```json
+  {
+    "title": "any",
+    "subtitle": "any",
+    "cover": "any",
     "content": [
       "..."
     ],
@@ -322,8 +304,16 @@ In a real app, you would decode the token to get the user ID.
     "id": "string"
   }
   ```
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
-### 5.5 删除碎片
+### 5.6 删除碎片
 - **URL**: `/api/v1/backstage/snippets/delete`
 - **Method**: `POST`
 - **请求参数**:
@@ -333,7 +323,13 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
 ## 6. 分类与标签 (Taxonomy)
 
@@ -342,15 +338,11 @@ In a real app, you would decode the token to get the user ID.
 - **Method**: `GET`
 - **响应数据**:
   ```json
-  [
-    {
-      "name": "...",
-      "icon": "...",
-      "color": "...",
-      "id": "...",
-      "count": "..."
-    }
-  ]
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
   ```
 
 ### 6.2 创建分类
@@ -367,11 +359,9 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "name": "string",
-    "icon": "any",
-    "color": "any",
-    "id": "string",
-    "count": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -381,20 +371,18 @@ In a real app, you would decode the token to get the user ID.
 - **请求参数**:
   ```json
   {
-    "id": "string",
-    "name": "string",
+    "name": "any",
     "icon": "any",
-    "color": "any"
+    "color": "any",
+    "id": "string"
   }
   ```
 - **响应数据**:
   ```json
   {
-    "name": "string",
-    "icon": "any",
-    "color": "any",
-    "id": "string",
-    "count": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -408,21 +396,24 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
 ### 6.5 获取标签列表
 - **URL**: `/api/v1/backstage/tags`
 - **Method**: `GET`
 - **响应数据**:
   ```json
-  [
-    {
-      "name": "...",
-      "color": "...",
-      "id": "...",
-      "count": "..."
-    }
-  ]
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
   ```
 
 ### 6.6 创建标签
@@ -438,10 +429,9 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "name": "string",
-    "color": "any",
-    "id": "string",
-    "count": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -451,18 +441,17 @@ In a real app, you would decode the token to get the user ID.
 - **请求参数**:
   ```json
   {
-    "id": "string",
-    "name": "string",
-    "color": "any"
+    "name": "any",
+    "color": "any",
+    "id": "string"
   }
   ```
 - **响应数据**:
   ```json
   {
-    "name": "string",
-    "color": "any",
-    "id": "string",
-    "count": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -476,7 +465,13 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
 ## 7. 通用接口 (Common)
 
@@ -488,8 +483,9 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "url": "string",
-    "filename": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -512,12 +508,9 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "id": "string",
-    "choices": [
-      "..."
-    ],
-    "created": 0,
-    "model": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -532,14 +525,11 @@ In a real app, you would decode the token to get the user ID.
   - `limit`: - 
 - **响应数据**:
   ```json
-  [
-    {
-      "id": "...",
-      "name": "...",
-      "description": "...",
-      "owner": "..."
-    }
-  ]
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
   ```
 
 ### 9.2 Create Project
@@ -558,14 +548,13 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "id": 0,
-    "name": "string",
-    "description": "string",
-    "owner": "string"
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-## 10. 前台首页 (Home)
+## 10. Nest-home
 
 ### 10.1 获取最新文章
 - **URL**: `/api/v1/nest/home/latest-articles`
@@ -574,22 +563,9 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "title": "string",
-    "url": "string",
-    "articles": [
-      {
-        "cover": "string",
-        "title": "string",
-        "subdesc": "string",
-        "url": "string",
-        "time": "string",
-        "views": 0,
-        "category": "string",
-        "tags": [
-          "string"
-        ]
-      }
-    ]
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
@@ -600,117 +576,111 @@ In a real app, you would decode the token to get the user ID.
 - **响应数据**:
   ```json
   {
-    "diaryCards": [
-      {
-        "title": "string",
-        "url": "string",
-        "bgStyle": "string",
-        "textStyle": "string"
-      }
-    ]
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-## 11. 前台博客 (Blog)
+## 11. Nest-blog
 
 ### 11.1 获取博客文章列表
 - **URL**: `/api/v1/nest/blog/list`
 - **Method**: `GET`
-- **描述**: 获取博客文章列表，支持分页、分类/标签筛选、关键词搜索及按年份筛选。
 - **Query 参数**:
-  - `page`: 当前页码 (默认 1)
-  - `pageSize`: 每页条数 (默认 10)
-  - `categoryId`: 按分类ID筛选 (可选)
-  - `tag`: 按标签名筛选 (可选)
-  - `keyword`: 搜索关键词 (可选)
-  - `year`: 按年份筛选 (可选)
+  - `page`: 当前页码 
+  - `pageSize`: 每页条数 
+  - `categoryId`: 按分类ID筛选 
+  - `tag`: 按标签名筛选 
+  - `keyword`: 搜索关键词 
+  - `year`: 按年份筛选 
 - **响应数据**:
   ```json
   {
-    "list": [
-      {
-        "id": "string",
-        "title": "string",
-        "desc": "string",
-        "slug": "string",
-        "cover": "string",
-        "date": "string",
-        "category": {
-          "id": "string",
-          "name": "string"
-        },
-        "tags": [
-          "string"
-        ],
-        "views": 0
-      }
-    ],
-    "total": 0,
-    "totalPages": 0,
-    "currentPage": 0
+    "code": 0,
+    "message": "string",
+    "data": "any"
   }
   ```
 
-### 11.2 获取博客文章详情
-- **URL**: `/api/v1/nest/blog/{id}`
-- **Method**: `GET`
-- **描述**: 获取博客文章详情，包括正文内容。同时会增加文章的浏览量。仅能获取已发布（published）的文章。
-- **响应数据**:
-  ```json
-  {
-    "id": "string",
-    "title": "string",
-    "desc": "string",
-    "slug": "string",
-    "cover": "string",
-    "date": "string",
-    "content": "string",
-    "category": {
-      "id": "string",
-      "name": "string"
-    },
-    "tags": [
-      "string"
-    ],
-    "views": 0
-  }
-  ```
-
-### 11.3 获取分类统计
+### 11.2 获取分类统计列表
 - **URL**: `/api/v1/nest/blog/categories`
 - **Method**: `GET`
-- **描述**: 获取博客分类统计数据。
 - **响应数据**:
   ```json
-  [
-    {
-      "id": "string",
-      "name": "string",
-      "count": 0,
-      "icon": "string"
-    }
-  ]
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
   ```
 
-### 11.4 获取标签统计列表
+### 11.3 获取热门标签
 - **URL**: `/api/v1/nest/blog/tags`
 - **Method**: `GET`
-- **描述**: 获取所有标签及其关联的文章数量统计。无关联文章的标签 count 为 0。
 - **响应数据**:
   ```json
-  [
-    {
-      "name": "string",
-      "count": 0
-    }
-  ]
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
   ```
 
-## 12. Other
+### 11.4 获取博客详情
+- **URL**: `/api/v1/nest/blog/{id}`
+- **Method**: `GET`
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 
-### 11.1 Root
+## 12. DevinNest 碎片 (Snippets)
+
+### 12.1 获取日常碎片时间轴
+- **URL**: `/api/v1/nest/snippet/timeline`
+- **Method**: `GET`
+- **描述**: 获取日常碎片列表，按年份分组返回。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+## 13. Common
+
+### 13.1 文件上传
+- **URL**: `/api/v1/upload`
+- **Method**: `POST`
+- **描述**: 上传文件到服务器。
+- **请求参数**:
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
+## 14. Other
+
+### 14.1 Root
 - **URL**: `/`
 - **Method**: `GET`
 - **响应数据**:
-  (无返回数据)
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
 

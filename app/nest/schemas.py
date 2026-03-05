@@ -75,3 +75,15 @@ class SnippetItem(BaseModel):
 
 class LatestSnippetsResponse(BaseModel):
     diaryCards: List[SnippetItem]
+
+class TimelineItem(BaseModel):
+    blogId: str
+    time: str
+    title: str
+    content: Optional[str] = None
+    url: Optional[str] = None
+
+class TimelineGroup(BaseModel):
+    year: int
+    items: List[TimelineItem]
+

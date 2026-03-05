@@ -3,6 +3,7 @@ from app.llm.api import router as llm_router
 from app.nest.api.projects import router as nest_projects_router
 from app.nest.api.home import router as nest_home_router
 from app.nest.api.blog import router as nest_blog_router
+from app.nest.api.snippets import router as nest_snippets_router
 
 # Backstage routers
 from app.backstage.api.auth import router as auth_router
@@ -23,6 +24,7 @@ nest_router = APIRouter()
 nest_router.include_router(nest_projects_router, prefix="/projects", tags=["nest-projects"])
 nest_router.include_router(nest_home_router, prefix="/home", tags=["nest-home"])
 nest_router.include_router(nest_blog_router, prefix="/blog", tags=["nest-blog"])
+nest_router.include_router(nest_snippets_router, prefix="/snippet", tags=["nest-snippet"])
 api_router.include_router(nest_router, prefix="/nest")
 
 # DevinNest Backstage (Admin) Routes
