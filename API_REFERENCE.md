@@ -654,6 +654,19 @@ In a real app, you would decode the token to get the user ID.
   }
   ```
 
+### 12.2 获取日常碎片详情
+- **URL**: `/api/v1/nest/snippet/{id}`
+- **Method**: `GET`
+- **描述**: 根据 ID 获取日常碎片详情。
+- **响应数据**:
+  ```json
+  {
+    "code": 0,
+    "message": "string",
+    "data": "any"
+  }
+  ```
+
 ## 13. Common
 
 ### 13.1 文件上传

@@ -1,5 +1,6 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from pydantic import BaseModel
+from datetime import datetime
 
 class Project(BaseModel):
     id: int
@@ -86,4 +87,21 @@ class TimelineItem(BaseModel):
 class TimelineGroup(BaseModel):
     year: int
     items: List[TimelineItem]
+
+class SnippetDetail(BaseModel):
+    id: str
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    cover: Optional[str] = None
+    content: Optional[List[Any]] = None
+    createdAt: datetime
+    views: int = 0
+    tags: List[str] = []
+    
+    # Metadata fields
+    date: Optional[datetime] = None
+    weather: Optional[str] = None
+    mood: Optional[str] = None
+    location: Optional[str] = None
+
 

@@ -1,11 +1,11 @@
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from typing import List
 from app.core.database import get_db
 from app.models import Snippet
-from app.nest.schemas import TimelineGroup, TimelineItem
+from app.nest.schemas import TimelineGroup, TimelineItem, SnippetDetail
 from app.backstage.schemas import ApiResponse
 from collections import defaultdict
 
@@ -60,3 +60,34 @@ async def get_snippet_timeline(db: Session = Depends(get_db)):
         ))
         
     return ApiResponse(data=result)
+
+@router.get("/{id}", response_model=ApiResponse[SnippetDetail], summary="获取日常碎片详情")
+async def get_snippet_detail(id: str, db: Session = Depends(get_db)):
+    """
+    根据 ID 获取日常碎片详情。
+    """
+    snippet = db.query(Snippet).filter(Snippet.id == id).first()
+    if not snippet:
+        raise HTTPException(status_code=404, detail="Snippet not found")
+    
+    # Increase views
+    snippet.views += 1
+    db.commit()
+    db.refresh(snippet)
+    
+    metadata = snippet.metadata_info or {}
+    
+    return ApiResponse(data=SnippetDetail(
+        id=snippet.id,
+        title=snippet.title,
+        subtitle=snippet.subtitle,
+        cover=snippet.cover,
+        content=snippet.content,
+        createdAt=snippet.created_at,
+        views=snippet.views,
+        tags=[tag.name for tag in snippet.tags],
+        date=metadata.get("date"),
+        weather=metadata.get("weather"),
+        mood=metadata.get("mood"),
+        location=metadata.get("location")
+    ))
