@@ -6,6 +6,8 @@ SERVER_USER="root"
 REMOTE_DIR="/opt/devinnest-backend"
 
 # 排除的文件和目录
+# 注意：data/ 与 static/uploads/ 是线上「有状态数据」(数据库 / 用户上传)，
+# 必须排除，避免被本地内容覆盖、或被下方 rsync 的 --delete 清除。
 EXCLUDE_PARAMS=(
     --exclude=".git/"
     --exclude=".env"
@@ -15,20 +17,22 @@ EXCLUDE_PARAMS=(
     --exclude="*.pyc"
     --exclude=".idea/"
     --exclude=".vscode/"
-    --exclude="data/devinnest.db"
+    --exclude="data/"
+    --exclude="static/uploads/"
+    --exclude="backups/"
 )
 
 echo "============================================"
 echo "开始部署 DevinNest Backend 到 $SERVER_IP"
 echo "============================================"
 
-# 0. 清理旧目录（一次性操作，可保留或删除）
-echo "[0/3] 清理旧部署目录..."
-ssh "$SERVER_USER@$SERVER_IP" "rm -rf /opt/devinnest-backend"
+# 0. 确保远程目录存在（不再 rm -rf 整个目录，以保留线上数据库与上传文件）
+echo "[0/3] 准备远程目录..."
+ssh "$SERVER_USER@$SERVER_IP" "mkdir -p $REMOTE_DIR"
 
 # 1. 同步文件
 echo "[1/3] 同步文件到服务器..."
-rsync -avz --progress "${EXCLUDE_PARAMS[@]}" ./ "$SERVER_USER@$SERVER_IP:$REMOTE_DIR"
+rsync -avz --delete --progress "${EXCLUDE_PARAMS[@]}" ./ "$SERVER_USER@$SERVER_IP:$REMOTE_DIR"
 
 if [ $? -ne 0 ]; then
     echo "❌ 文件同步失败，请检查网络连接或权限。"

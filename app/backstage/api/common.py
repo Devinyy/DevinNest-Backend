@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Request
 from app.backstage.schemas import UploadResponse, ApiResponse
+from app.core.config import settings
 import shutil
 import os
 import uuid
@@ -39,8 +40,10 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
     
     # Construct URL
-    # Assuming the app is served at root, and static files are mounted at /static
-    base_url = str(request.base_url).rstrip("/")
+    # 优先使用配置的对外地址（含端口，如 https://devinnest-api.top:8443），
+    # 避免反向代理/Cloudflare 丢失端口导致返回的 URL 不可访问；
+    # 未配置 PUBLIC_BASE_URL 时回退到 request.base_url（本地开发）
+    base_url = (settings.PUBLIC_BASE_URL or str(request.base_url)).rstrip("/")
     file_url = f"{base_url}/static/uploads/{final_filename}"
     
     return ApiResponse(data=UploadResponse(

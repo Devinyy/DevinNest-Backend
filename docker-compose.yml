@@ -10,6 +10,8 @@ services:
     volumes:
       - ./data:/app/data
       - ./static:/app/static
-      - ./.env:/app/.env
     environment:
       - PYTHONPATH=/app
+      # 对外地址（含端口），供后端拼接上传文件 URL，避免反代/Cloudflare 丢端口
+      # （原 ./.env 挂载因宿主机无此文件被 Docker 创建成了目录，已移除该挂载）
+      - PUBLIC_BASE_URL=https://devinnest-api.top:8443
